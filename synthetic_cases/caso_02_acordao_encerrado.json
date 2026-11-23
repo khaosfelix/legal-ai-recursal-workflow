@@ -1,0 +1,19 @@
+{
+  "id_caso": "DEMO-002",
+  "fase": "acordao",
+  "resultado_decisao": "desprovido",
+  "data_intimacao": "2026-10-20",
+  "data_analise": "2026-11-20",
+  "ed_interposto": false,
+  "ed_julgado": false,
+  "recurso_subsequente": {
+    "nome": "RECURSO SUBSEQUENTE DEMO",
+    "prazo_dias_uteis": 15,
+    "interposto": false,
+    "data_base": "2026-10-20"
+  },
+  "dano_moral": "3000",
+  "dano_material_exato": "650",
+  "percentual_honorarios": "10",
+  "recomendar_recurso": false
+}

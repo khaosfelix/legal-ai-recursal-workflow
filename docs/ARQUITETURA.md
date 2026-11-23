@@ -1,94 +1,43 @@
 # Arquitetura
 
-## Princípio
+A arquitetura foi separada entre leitura probabilística e operação determinística.
 
-A arquitetura usa uma separação simples:
+## Camada de IA
 
-**probabilístico para compreender; determinístico para controlar.**
+Responsável por:
+- ler a íntegra;
+- localizar a decisão candidata;
+- organizar histórico;
+- separar alegação, prova e conclusão;
+- extrair datas, valores e obrigações;
+- apontar possíveis teses e riscos.
 
-A LLM pode interpretar documentos e produzir um contrato estruturado. O motor Python recebe esse contrato e executa regras reproduzíveis.
+## Camada determinística
 
-## Componentes
+Responsável por:
+- ED;
+- recurso subsequente;
+- trânsito;
+- cálculos financeiros;
+- complemento em execução;
+- elegibilidade dos campos da calculadora externa;
+- consistência da saída;
+- geração do DOCX público de demonstração.
 
-### 1. Extração
+## Saídas
 
-Responsabilidade da camada de IA:
-- localizar decisão;
-- extrair datas e valores;
-- classificar resultado;
-- estruturar obrigação;
-- sinalizar incerteza.
+A solução não termina no parecer textual.
 
-### 2. Contrato de dados
+Ela produz:
+- posicionamento;
+- bloco para cadastro;
+- linha de trânsito pronta para copiar;
+- campos para calculadora externa quando a fase é sentença;
+- referência DOCX;
+- justificativa operacional em cumprimento quando necessária.
 
-O JSON de entrada funciona como fronteira entre IA e código.
+## Sistemas externos
 
-Benefícios:
-- troca de provedor sem reescrever regras;
-- testes sem chamar LLM;
-- reprocessamento determinístico;
-- auditoria do que foi efetivamente extraído.
+Na implementação real, a referência e a própria decisão eram cadastradas em sistemas jurídicos distintos da instituição e do escritório.
 
-### 3. Validação
-
-Falha cedo em:
-- datas impossíveis;
-- valores negativos;
-- combinações incoerentes;
-- percentuais fora do limite do demo.
-
-### 4. Motor de prazos
-
-Recebe:
-- intimação;
-- data de análise;
-- feriados opcionais;
-- informação sobre ED.
-
-Devolve prazo e status.
-
-### 5. Motor financeiro
-
-Usa `Decimal`.
-
-Distingue:
-- dano material exato;
-- estimativa;
-- honorários;
-- outras verbas;
-- compensação;
-- exposição bruta.
-
-### 6. Motor de roteamento
-
-Regras sintéticas versionadas escolhem uma rota.
-
-### 7. Auditoria
-
-A saída inclui trilha textual das decisões do motor.
-
-## Integração futura
-
-```mermaid
-flowchart TD
-    A[PDF/DOCX/API] --> B[Parser]
-    B --> C[LLM]
-    C --> D[Structured Output]
-    D --> E[Schema Validation]
-    E --> F[Rule Engine]
-    F --> G[Persistence/Audit]
-    G --> H[API/UI]
-    H --> I[Human Approval]
-```
-
-## O que não está implementado
-
-- fornecedor de LLM;
-- OCR;
-- RAG;
-- banco de dados;
-- API web;
-- autenticação;
-- calendário oficial.
-
-A ausência é intencional na versão pública.
+A versão pública não integra com nenhum desses sistemas. Ela apenas reproduz o estágio anterior ao cadastro.

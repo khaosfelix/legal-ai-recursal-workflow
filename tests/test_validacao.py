@@ -1,39 +1,35 @@
 import unittest
-from copy import deepcopy
 
 from _bootstrap import ROOT  # noqa: F401
 from legal_ai_recursal.models import CasoEntrada
-from legal_ai_recursal.validacao import validar_caso
-
-
-BASE = {
-    "id_caso": "T-VALID",
-    "fase": "sentenca",
-    "resultado_decisao": "procedente",
-    "data_intimacao": "2026-11-03",
-    "data_analise": "2026-11-04",
-}
+from legal_ai_recursal.validacao import validar
 
 
 class ValidacaoTests(unittest.TestCase):
-    def test_rejeita_valor_negativo(self):
-        payload = deepcopy(BASE)
-        payload["dano_moral"] = "-1"
+    def test_ed_julgado_exige_nova_data(self):
+        c = CasoEntrada.from_dict({
+            "id_caso": "X",
+            "fase": "sentenca",
+            "resultado_decisao": "procedente",
+            "data_intimacao": "2026-11-01",
+            "data_analise": "2026-11-20",
+            "ed_interposto": True,
+            "ed_julgado": True,
+        })
         with self.assertRaises(ValueError):
-            validar_caso(CasoEntrada.from_dict(payload))
+            validar(c)
 
-    def test_rejeita_analise_anterior_a_intimacao(self):
-        payload = deepcopy(BASE)
-        payload["data_analise"] = "2026-11-02"
+    def test_valor_negativo_falha(self):
+        c = CasoEntrada.from_dict({
+            "id_caso": "X",
+            "fase": "sentenca",
+            "resultado_decisao": "procedente",
+            "data_intimacao": "2026-11-01",
+            "data_analise": "2026-11-20",
+            "dano_moral": "-1",
+        })
         with self.assertRaises(ValueError):
-            validar_caso(CasoEntrada.from_dict(payload))
-
-    def test_rejeita_anulacao_fora_de_acordao(self):
-        payload = deepcopy(BASE)
-        payload["resultado_decisao"] = "anulado"
-        payload["decisao_anulada"] = True
-        with self.assertRaises(ValueError):
-            validar_caso(CasoEntrada.from_dict(payload))
+            validar(c)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,16 @@
+{
+  "id_caso": "DEMO-006",
+  "fase": "sentenca",
+  "resultado_decisao": "procedente",
+  "data_intimacao": "2026-11-03",
+  "data_analise": "2026-11-20",
+  "ed_interposto": true,
+  "ed_julgado": false,
+  "recurso_subsequente": {
+    "nome": "APELAÇÃO DEMO",
+    "prazo_dias_uteis": 15,
+    "interposto": false
+  },
+  "teses_prioritarias": ["omissão sobre compensação"],
+  "recomendar_recurso": true
+}

@@ -7,365 +7,497 @@
     <img src="https://github.com/khaosfelix/legal-ai-recursal-workflow/actions/workflows/ci.yml/badge.svg" alt="CI">
   </a>
   <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white" alt="Python 3.11+">
-  <img src="https://img.shields.io/badge/depend%C3%AAncias_runtime-zero-6D28D9" alt="Zero dependências de runtime">
-  <img src="https://img.shields.io/badge/dados-100%25_sint%C3%A9ticos-7C3AED" alt="Dados sintéticos">
-  <img src="https://img.shields.io/badge/human--in--the--loop-obrigat%C3%B3rio-A855F7" alt="Human in the loop">
+  <img src="https://img.shields.io/badge/dados-sint%C3%A9ticos-7C3AED" alt="Dados sintéticos">
 </p>
 
 # Legal AI Recursal Workflow
 
-Automação jurídica híbrida para **análise estruturada de decisões, cálculo de prazos e exposição financeira, roteamento recursal e geração de saídas auditáveis**.
+Este projeto nasceu de uma rotina de análise recursal em **contencioso cível massificado de instituição financeira**.
 
-Este repositório é uma versão pública, sintética e redesenhada para portfólio de uma arquitetura de automação jurídica. O foco não é “pedir para uma LLM decidir tudo”: o projeto separa interpretação de texto, regras de negócio, cálculos e validações em camadas distintas.
+O volume não tornava o trabalho simples. Cada decisão precisava ser lida dentro do histórico do processo, comparada com o que havia sido pedido, defendido e provado, e depois convertida em uma série de providências operacionais: prazo de ED, recurso subsequente, trânsito em julgado, exposição financeira, obrigação de fazer, posicionamento recursal e dados para cadastro.
 
-> **Ideia central:** usar IA onde existe ambiguidade textual e usar código determinístico onde erro não deveria depender de probabilidade.
+Além disso, a operação já utilizava ferramentas próprias da instituição e do escritório. A automação não foi criada para substituir essas ferramentas. Ela foi criada para **chegar até elas com a análise pronta**.
+
+Um exemplo importante é a calculadora recursal: ela é uma ferramenta externa da instituição financeira. Em sentenças elegíveis, a automação analisa o caso e devolve os campos necessários para preenchê-la. Em acórdãos e decisões de cumprimento, essa etapa não existe.
+
+A versão deste repositório é pública e usa apenas dados sintéticos. Mantive o desenho do fluxo e os problemas que precisei resolver, mas não publiquei nomes de clientes, sistemas, documentos, códigos de cadastro, políticas internas ou regras privadas.
 
 ---
 
-## Em 30 segundos
+## O fluxo que eu automatizei
 
-O workflow recebe um caso estruturado, valida os dados, calcula prazo de Embargos de Declaração, apura exposição financeira com `Decimal`, separa compensações do total bruto, identifica gatilhos recursais fictícios, trata decisões anuladas e devolve uma saída com **rota, registro, alertas e trilha de auditoria**.
-
-A camada pública é **LLM-agnostic**: o contrato de extração está documentado, mas nenhuma chave, provedor ou API privada é necessária para executar o demo.
-
-```text
-documentos
-   ↓
-extração estruturada por LLM
-   ↓
-contrato de dados
-   ↓
-validação
-   ↓
-motor determinístico
-   ├── prazos
-   ├── financeiro
-   ├── obrigações
-   └── roteamento
-   ↓
-trilha de auditoria
-   ↓
-validação humana
+```mermaid
+flowchart TD
+    A[Íntegra processual] --> B[Identificar decisão candidata]
+    B --> C[Confirmar decisão]
+    C --> D[Ler histórico + provas + decisões]
+    D --> E[Análise recursal]
+    E --> F[Calcular ED]
+    F --> G[Calcular recurso subsequente]
+    G --> H[Apurar trânsito]
+    H --> I[Apurar condenação / OBF / risco]
+    I --> J{Fase}
+    J -->|Sentença| K[Entregar campos da calculadora externa]
+    J -->|Acórdão| L[Sem calculadora]
+    J -->|Cumprimento| M[Sem calculadora]
+    K --> N[Posicionamento / dispensa]
+    L --> N
+    M --> N
+    N --> O[Gerar referência DOCX]
+    O --> P[Dados prontos para cadastro]
+    P --> Q[Sistema da instituição + sistema do escritório]
 ```
 
----
-
-## O problema que o projeto resolve
-
-Em contencioso de alto volume, uma análise operacional pode exigir simultaneamente:
-
-- localizar e classificar a decisão relevante;
-- transformar texto jurídico em campos estruturados;
-- calcular prazos em dias úteis;
-- distinguir valor exato de estimativa;
-- calcular honorários e exposição financeira;
-- manter compensações rastreáveis sem distorcer o valor bruto;
-- identificar obrigações de fazer de forma operacional;
-- reconhecer gatilhos para revisão recursal;
-- tratar decisões anuladas sem carregar efeitos da decisão anterior;
-- padronizar saídas;
-- impedir que mudanças no prompt quebrem regras já validadas.
-
-O desafio, portanto, não é apenas gerar texto. É **orquestrar interpretação, regras, cálculos, governança e revisão humana**.
+A revisão humana continua no fluxo. O objetivo é reduzir leitura repetitiva, cálculo manual e retrabalho de cadastro — não eliminar o advogado da decisão.
 
 ---
 
-## Funcionalidades
+## 1. Leitura da íntegra processual
 
-| Módulo | O que demonstra | Abordagem |
-|---|---|---|
-| Classificação decisória | Sentença, acórdão e cumprimento | Domínio tipado com `Enum` |
-| Prazo de ED | 5 dias úteis no cenário sintético | Motor determinístico |
-| Status do prazo | Aberto, ultrapassado ou ED apresentado | Regra auditável |
-| Danos materiais | Valor exato ou fallback estimado | Fonte do valor registrada |
-| Honorários | Percentual ou valor fixo | `Decimal`, sem `float` |
-| Exposição financeira | Soma bruta das verbas efetivas | Compensação separada |
-| Obrigação de fazer | Ação + objeto + identificador + local | Formatação operacional |
-| Roteamento | Revisão recursal, não recurso, retorno à origem ou revisão humana | Rule engine |
-| Decisão anulada | Limpa exposição/OBF anterior | Gate específico |
-| Prazo pós-retorno | Regra operacional sintética | Dias úteis |
-| Validação | Campos, datas, valores e consistência | Fail fast |
-| Auditoria | Motivos de cada etapa | Trilha textual |
-| Privacidade | Casos sintéticos + scanner de publicação | Privacy by design |
-| Qualidade | Testes unitários e CI | GitHub Actions |
+A análise foi pensada para cruzar, quando disponíveis:
+
+- petição inicial;
+- documentos da parte autora;
+- contestação;
+- subsídios;
+- réplica;
+- contratos;
+- logs e registros de autenticação;
+- extratos;
+- comprovantes de crédito;
+- estornos e movimentações;
+- tutelas;
+- sentença;
+- Embargos de Declaração;
+- recursos;
+- contrarrazões;
+- acórdãos;
+- decisões em cumprimento/execução.
+
+Um ponto importante do fluxo é separar **alegação, prova e conclusão judicial**. Isso evita tratar como fato algo que apareceu apenas na narrativa de uma das partes.
+
+Na versão pública, essa etapa é representada por um contrato JSON já normalizado, para que o core possa ser testado sem depender de uma API de LLM.
 
 ---
 
-## Arquitetura
+## 2. Análise recursal
+
+A automação não olha só para o dispositivo.
+
+Ela organiza, conforme o caso:
+
+- pedidos e controvérsia;
+- prescrição;
+- contratação e subsídios;
+- suficiência de prova;
+- crédito e movimentação;
+- proveito econômico;
+- compensação;
+- estornos;
+- repetição;
+- danos materiais e morais;
+- honorários;
+- custas;
+- índices e juros;
+- obrigação de fazer;
+- risco;
+- possíveis vícios para ED;
+- matéria para recurso subsequente.
+
+Em produtos financeiros, por exemplo, o fluxo diferencia **crédito lançado em conta** de **proveito econômico efetivo**. Dependendo do caso, isso exige olhar o que aconteceu depois do crédito: saque, transferência, movimentação, estorno ou recomposição.
+
+---
+
+## 3. ED, recurso subsequente e trânsito em julgado
+
+Esses três pontos fazem parte do mesmo bloco operacional.
+
+### Embargos de Declaração
+
+O motor calcula e classifica o prazo como:
+
+- `ABERTO`;
+- `ULTRAPASSADO`;
+- `APRESENTADO`;
+- `AGUARDANDO_EVENTO`.
+
+### Recurso subsequente
+
+A perda do prazo de ED não encerra automaticamente a análise.
+
+Antes de concluir que não haverá recurso, o fluxo verifica se existe um recurso subsequente candidato e calcula seu prazo.
+
+Isso é relevante porque, na operação que originou o projeto, o prazo e a conclusão recursal precisavam ser cadastrados quando o caso seguia sem recurso.
+
+### Trânsito em julgado
+
+O fluxo diferencia:
+
+- `CERTIFICADO`: existe data expressa;
+- `ESTIMADO`: todos os prazos configurados encerraram sem recurso pendente;
+- `NÃO APURADO`: ainda existe prazo, recurso ou evento processual em aberto.
+
+Uma estimativa nunca é apresentada como certidão.
+
+A saída também pode fornecer a data já formatada para copiar no cadastro.
+
+---
+
+## 4. Posicionamento recursal
+
+Quando existe matéria para revisão, a entrega não é apenas “recorrer”.
+
+O posicionamento pode organizar:
+
+- instrumento candidato;
+- objetivo da reforma;
+- teses prioritárias;
+- ponto da decisão a atacar;
+- documentos e provas relevantes;
+- riscos;
+- pedidos subsidiários;
+- possível benefício econômico.
+
+A finalidade é acelerar a análise e já deixar um roteiro objetivo para quem vai elaborar a peça.
+
+Quando não há fundamento ou utilidade recursal, o fluxo também pode gerar uma justificativa de não interposição para o cadastro operacional.
+
+---
+
+## 5. Calculadora recursal externa
+
+Esta é uma distinção importante do projeto:
+
+**eu não construí a calculadora recursal.**
+
+Ela já existia como ferramenta da instituição financeira.
+
+O que eu automatizei foi a análise anterior ao preenchimento.
+
+Em **sentenças elegíveis**, o workflow entrega um bloco com os dados processuais, jurídicos e financeiros necessários para preencher a ferramenta externa.
+
+Exemplo público e simplificado:
+
+```text
+CALCULADORA EXTERNA — CAMPOS PARA PREENCHIMENTO
+
+Fase: SENTENÇA
+Tipo de procedimento: DEMO
+Liquidez: LÍQUIDA
+UF: XX
+Identificador do processo: DEMO0001
+Critérios jurídicos identificados:
+- questão de compensação
+
+Dano moral: R$ 5.000,00
+Dano material: R$ 1.200,00
+Total moral + material: R$ 6.200,00
+```
+
+Em **acórdão** e **cumprimento/execução**, o bloco não é gerado.
+
+No código isso é tratado explicitamente, e há teste garantindo que a calculadora externa só apareça em sentença.
+
+---
+
+## 6. Condenação e exposição
+
+A automação tenta evitar saídas vagas como `a apurar` quando existe base documental para chegar a um número ou a uma estimativa operacional.
+
+O motor público diferencia:
+
+- valor material exato;
+- estimativa;
+- honorários;
+- outras verbas;
+- compensação;
+- exposição bruta.
+
+Exemplo:
+
+```text
+danos morais
++ danos materiais
++ honorários
++ demais verbas efetivas
+= exposição bruta
+```
+
+A compensação é registrada separadamente para não esconder o valor bruto.
+
+---
+
+## 7. Obrigação de fazer
+
+A obrigação é convertida em instrução operacional.
+
+Em vez de:
+
+```text
+cessar cobrança
+```
+
+a saída busca algo como:
+
+```text
+Cancelar a cesta de serviços identificada como DEMO-PACOTE na conta fictícia da parte autora.
+```
+
+A mesma lógica vale para contrato, operação, anotação ou outro objeto identificável.
+
+---
+
+## 8. Cumprimento e execução
+
+Decisões em cumprimento têm fluxo próprio.
+
+O projeto público demonstra:
+
+- valor devido;
+- valor já pago ou garantido;
+- diferença;
+- complemento;
+- distinção entre pagamento e garantia;
+- justificativa operacional.
+
+Essa fase não gera campos para a calculadora recursal externa.
+
+---
+
+## 9. Acórdão que anula/cassa a sentença
+
+Quando a sentença deixa de produzir efeitos por causa do acórdão, o fluxo não reaproveita automaticamente a condenação anterior.
+
+A automação:
+
+- zera a exposição que dependia da sentença anulada;
+- remove a obrigação de fazer anterior;
+- muda a rota para retorno à origem;
+- apura o trânsito;
+- calcula o próximo prazo operacional, quando possível;
+- diferencia cenário com contestação já apresentada e cenário sem contestação.
+
+---
+
+## 10. Referência DOCX e cadastro
+
+Uma parte importante da automação é transformar a análise em um artefato operacional.
+
+O workflow gera uma **referência em DOCX** com os campos estruturados da decisão.
+
+Esse arquivo era utilizado para facilitar o cadastro e acompanhar o arquivo da própria decisão em dois pontos da operação:
+
+- sistema jurídico da instituição financeira;
+- sistema do escritório.
+
+Além do DOCX, a saída em chat entrega os campos que precisam ser copiados para cadastro, como:
+
+- data da intimação;
+- prazo de ED;
+- prazo do recurso subsequente;
+- data/fonte do trânsito;
+- risco;
+- existência de obrigação;
+- tipo de providência;
+- justificativa de não recurso, quando cabível.
+
+Na versão pública, o DOCX é gerado por um renderer simples e sintético.
+
+---
+
+## 11. Outras rotinas que fazem parte da análise
+
+Nem tudo precisa virar um módulo público para fazer parte do fluxo. A automação original também consolidava ou conferia:
+
+- classificação e eventual agravamento de risco, sem fingir alteração no sistema externo;
+- custo recursal em separado da condenação;
+- índices e juros, mantendo a análise jurídica completa e uma saída operacional mais curta;
+- obrigação de fazer existente em decisão anterior ainda vigente, mesmo quando a decisão atual fosse silenciosa;
+- existência de acordo ou outra informação operacional externa como metadado do caso;
+- tipo de registro interno adequado à fase, instância e resultado;
+- justificativa de não interposição;
+- mensagem curta com identificação do caso, decisão, prazo e providência;
+- conferência final para evitar saída sem prazo, OBF, condenação ou providência quando esses dados eram aplicáveis.
+
+Essas rotinas estão descritas com mais detalhe em [`docs/ESCOPO_FUNCIONAL_COMPLETO.md`](docs/ESCOPO_FUNCIONAL_COMPLETO.md), sem reproduzir códigos ou tabelas internas.
+
+---
+
+## Como a IA entra no projeto
+
+A arquitetura ficou dividida em duas camadas.
 
 ```mermaid
 flowchart LR
-    A[Documentos / texto jurídico] --> B[LLM: extração]
-    B --> C[Contrato estruturado]
-    C --> D[Validação de entrada]
-    D --> E[Orquestrador]
-    E --> F[Motor de prazos]
-    E --> G[Motor financeiro]
-    E --> H[Motor de obrigações]
-    E --> I[Motor de roteamento]
-    F --> J[Validação de saída]
-    G --> J
-    H --> J
-    I --> J
-    J --> K[Trilha de auditoria]
-    K --> L[Human-in-the-loop]
-    L --> M[Saída final]
+    A[Documentos] --> B[LLM / extração]
+    B --> C[Dados estruturados]
+    C --> D[Regras determinísticas]
+    D --> E[Prazos]
+    D --> F[Cálculos]
+    D --> G[Roteamento]
+    D --> H[Campos operacionais]
+    E --> I[Saída]
+    F --> I
+    G --> I
+    H --> I
+    I --> J[Revisão humana]
 ```
 
-### Máquina de estados conceitual
+A LLM é usada onde existe linguagem, contexto e necessidade de localizar informação.
 
-```mermaid
-stateDiagram-v2
-    [*] --> Entrada
-    Entrada --> DeteccaoDecisao
-    DeteccaoDecisao --> ConfirmacaoHumana
-    ConfirmacaoHumana --> ClassificacaoFase
-    ClassificacaoFase --> ExtracaoFatos
-    ExtracaoFatos --> CalculoPrazo
-    CalculoPrazo --> ExposicaoFinanceira
-    ExposicaoFinanceira --> Roteamento
-    Roteamento --> Validacao
-    Validacao --> AprovacaoHumana
-    AprovacaoHumana --> Saida
-    Saida --> [*]
-```
+Código é usado onde eu queria comportamento reproduzível:
+
+- datas;
+- dias úteis;
+- somas;
+- status;
+- gates;
+- elegibilidade da calculadora externa;
+- trânsito;
+- complemento financeiro;
+- consistência da saída.
 
 ---
 
-## Decisões de engenharia
+## Estrutura do repositório
 
-### 1. `Decimal` para dinheiro
+```text
+src/legal_ai_recursal/
+├── calendario.py
+├── calculadora_externa.py
+├── docx_renderer.py
+├── engine.py
+├── execucao.py
+├── financeiro.py
+├── models.py
+├── obrigacoes.py
+├── posicionamento.py
+├── recursos.py
+└── validacao.py
+```
 
-Valores monetários não são calculados com `float`. O módulo financeiro usa `Decimal` e arredondamento explícito.
-
-### 2. LLM não calcula o que o código pode calcular
-
-A LLM é tratada como camada de **extração e interpretação**, não como calculadora de prazos ou exposição.
-
-### 3. Regras de domínio são explícitas
-
-Critérios recursais do demo são fictícios e ficam isolados no módulo de roteamento. Isso evita esconder regras importantes dentro de um prompt gigante.
-
-### 4. Saída explica o próprio caminho
-
-Além do resultado, o motor registra uma **trilha de auditoria**: prazo calculado, fonte do dano material, base de honorários, rota aplicada e alertas.
-
-### 5. Falha cedo
-
-Valores negativos, datas incoerentes e campos incompatíveis falham antes da análise final.
-
-### 6. Human-in-the-loop é requisito, não decoração
-
-O sistema produz apoio à decisão. A aprovação final é humana.
+Os casos de `synthetic_cases/` foram criados para testar situações que alteravam o fluxo durante o desenvolvimento.
 
 ---
 
-## Demo rápida
+## Casos sintéticos incluídos
 
-Não há dependências externas de runtime.
+O repositório inclui cenários como:
 
-### Windows / PowerShell
+1. sentença com matéria recursal e campos para calculadora externa;
+2. acórdão com ED e recurso subsequente já encerrados;
+3. acórdão com ED perdido, mas recurso subsequente ainda aberto;
+4. acórdão que anulou a sentença;
+5. cumprimento com pagamento complementar;
+6. ED interposto e ainda pendente de julgamento;
+7. sentença sem valor material exato, usando estimativa.
+
+---
+
+## Demo
 
 ```powershell
 python scripts/demo.py synthetic_cases/caso_01_sentenca.json
 ```
 
-### Linux / macOS
-
-```bash
-python3 scripts/demo.py synthetic_cases/caso_01_sentenca.json
-```
-
-### Saída esperada
+Saída resumida:
 
 ```text
 CASO: DEMO-001
 DECISÃO: PARCIALMENTE PROCEDENTE
-PRAZO ED: 10/11/2026 — ABERTO
+
+ED: 10/11/2026 — ABERTO
+RECURSO SUBSEQUENTE: APELAÇÃO DEMO
+PRAZO: 24/11/2026 — ABERTO
+TRÂNSITO: NÃO APURADO
+
 DANO MATERIAL: R$ 1.200,00 — VALOR_EXATO
 HONORÁRIOS: R$ 620,00
-COMPENSAÇÃO: R$ 800,00 — informada separadamente
 EXPOSIÇÃO BRUTA: R$ 6.820,00
-ROTA: REVISÃO RECURSAL RECOMENDADA
-REGISTRO: REGISTRO_DECISÃO_1_GRAU
-OBRIGAÇÃO: Cancelar a cesta de serviços identificada como DEMO-PACOTE na conta fictícia da parte autora.
+COMPENSAÇÃO: R$ 800,00 — separada
+
+POSICIONAMENTO:
+Revisar a interposição do recurso subsequente candidato...
+
+CALCULADORA EXTERNA:
+campos preparados para preenchimento
+
+DOCX:
+referencia_DEMO-001.docx
 ```
 
 ---
 
 ## Testes
 
-```bash
+```powershell
 python -m unittest discover -s tests -v
 ```
 
-A suíte cobre, entre outros:
+A suíte verifica, entre outros pontos:
 
-- contagem em dias úteis;
-- feriados fornecidos ao motor;
-- prazo aberto e ultrapassado;
-- preferência por dano material exato;
-- fallback para estimativa;
-- honorários percentuais e fixos;
-- compensação fora do total bruto;
-- prioridade de decisão anulada;
-- gatilho de não recurso em acórdão;
-- obrigação operacional;
-- validação de valores negativos;
-- fluxo completo de retorno à origem.
-
-O CI também executa uma **verificação de publicação**, procurando padrões de segredo e dados potencialmente inadequados para um repositório público.
-
----
-
-## Estrutura do projeto
-
-```text
-legal-ai-recursal-workflow/
-├── src/
-│   └── legal_ai_recursal/
-│       ├── calendario.py
-│       ├── engine.py
-│       ├── enums.py
-│       ├── financeiro.py
-│       ├── formatacao.py
-│       ├── models.py
-│       ├── obrigacoes.py
-│       ├── roteamento.py
-│       └── validacao.py
-├── prompts/
-│   ├── prompt_extracao.md
-│   └── system_prompt_demo.md
-├── knowledge_demo/
-│   ├── regras_publicas.md
-│   └── templates_saida.md
-├── schemas/
-│   ├── analise_saida.schema.json
-│   └── caso_entrada.schema.json
-├── synthetic_cases/
-│   ├── caso_01_sentenca.json
-│   ├── caso_02_acordao_prazo_ultrapassado.json
-│   ├── caso_03_acordao_anulado.json
-│   ├── caso_04_estimativa_material.json
-│   └── caso_05_cumprimento.json
-├── examples/
-├── tests/
-├── scripts/
-│   ├── demo.py
-│   └── verificar_publicacao.py
-└── docs/
-    ├── ARQUITETURA.md
-    ├── DECISOES_DE_DESIGN.md
-    ├── MAPA_DE_FUNCIONALIDADES.md
-    ├── PRIVACIDADE.md
-    ├── ROADMAP.md
-    └── COMO_APRESENTAR_EM_ENTREVISTA.md
-```
+- dias úteis;
+- ED aberto, perdido e pendente;
+- recurso subsequente;
+- bloqueio do trânsito;
+- trânsito estimado;
+- trânsito certificado;
+- dano material exato/estimado;
+- honorários;
+- compensação;
+- OBF;
+- posicionamento;
+- calculadora externa somente em sentença;
+- ausência de calculadora em acórdão;
+- ausência de calculadora em cumprimento;
+- decisão anulada;
+- complemento em execução;
+- geração de DOCX.
 
 ---
 
-## Camada de IA
+## Privacidade
 
-Este repositório não fixa OpenAI, Anthropic, Gemini ou outro provedor.
+O contexto genérico de instituição financeira foi mantido porque faz parte do problema de negócio, mas nenhuma organização é identificada.
 
-O contrato de extração está em [`prompts/prompt_extracao.md`](prompts/prompt_extracao.md) e [`schemas/caso_entrada.schema.json`](schemas/caso_entrada.schema.json).
-
-Em uma integração real, o fluxo seria:
-
-```text
-PDF / DOCX / API
-      ↓
-LLM / parser
-      ↓
-JSON validado
-      ↓
-Legal AI Recursal Engine
-```
-
-Essa separação permite trocar o modelo sem reescrever as regras determinísticas.
-
----
-
-## Privacidade e confidencialidade
-
-O repositório foi desenhado para ser público.
-
-Ele **não contém**:
+Não estão no repositório:
 
 - nomes de clientes;
 - nomes de escritórios;
+- nomes de sistemas;
+- códigos internos;
 - processos reais;
-- contratos reais;
-- documentos internos;
-- políticas empresariais;
-- códigos de sistemas privados;
-- screenshots corporativos;
-- credenciais;
-- endpoints privados.
+- documentos;
+- contratos;
+- prints;
+- manuais;
+- políticas privadas;
+- base de acordos;
+- tabelas internas;
+- credenciais.
 
-Todos os dados, regras e casos são sintéticos.
-
-A estratégia completa está em [`docs/PRIVACIDADE.md`](docs/PRIVACIDADE.md).
-
----
-
-## O que este projeto demonstra para recrutamento
-
-**Legal Ops / Legal Engineering**
-- modelagem de fluxo jurídico;
-- transformação de procedimento em regras;
-- padronização operacional;
-- controles de risco e revisão.
-
-**Automação e IA**
-- separação LLM × deterministic engine;
-- contratos de dados;
-- prompt design;
-- arquitetura modular;
-- integração model-agnostic.
-
-**Engenharia**
-- tipagem de domínio;
-- cálculos monetários com `Decimal`;
-- validações;
-- testes de regressão;
-- CI;
-- trilha de auditoria;
-- privacy by design.
+Todos os casos e regras são sintéticos.
 
 ---
 
-## Limitações conscientes
+## Limites da versão pública
 
-Este é um **case de portfólio**, não um sistema jurídico de produção.
+Este repositório não contém:
 
-- O calendário não consulta automaticamente tribunais ou feriados oficiais.
-- Os critérios recursais são fictícios.
-- A camada pública recebe JSON normalizado; a chamada real ao provedor de LLM não está incluída.
-- Não há persistência, autenticação ou interface web.
-- Nenhuma saída substitui revisão jurídica humana.
+- integração real com o sistema da instituição;
+- integração real com o sistema do escritório;
+- calculadora institucional;
+- política recursal privada;
+- documentos reais;
+- calendário oficial;
+- o mesmo template operacional utilizado internamente.
 
-Essas limitações são intencionais: o objetivo é demonstrar arquitetura e método sem reproduzir qualquer processo corporativo privado.
-
----
-
-## Roadmap
-
-- [ ] adapter de LLM com structured outputs;
-- [ ] camada RAG com fontes públicas;
-- [ ] API FastAPI;
-- [ ] persistência de auditoria;
-- [ ] dashboard de análise;
-- [ ] exportação DOCX;
-- [ ] calendário oficial plugável por tribunal;
-- [ ] métricas de qualidade e benchmark sintético.
-
-Veja [`docs/ROADMAP.md`](docs/ROADMAP.md).
+A versão pública mostra a arquitetura e a lógica geral sem reconstruir a operação confidencial.
 
 ---
 
 ## Autoria
 
-Projeto de portfólio de [@khaosfelix](https://github.com/khaosfelix), com foco em **Legal AI, automação jurídica e Legal Ops**.
+Projeto desenvolvido por [@khaosfelix](https://github.com/khaosfelix).
 
-A versão pública foi redesenhada com dados e regras sintéticos para demonstrar a arquitetura sem expor informações confidenciais.
+A versão pública foi reescrita com dados sintéticos para preservar confidencialidade, mantendo o fluxo que motivou o projeto: **ler melhor, calcular menos manualmente e chegar ao cadastro com a análise já organizada**.

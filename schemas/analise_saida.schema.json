@@ -4,88 +4,30 @@
   "type": "object",
   "required": [
     "id_caso",
-    "versao_regras",
     "decisao",
     "prazo_ed",
-    "status_prazo_ed",
-    "dano_material_utilizado",
-    "fonte_dano_material",
-    "honorarios",
-    "compensacao",
-    "exposicao_bruta",
+    "transito",
+    "financeiro",
     "rota",
-    "tipo_registro",
-    "alertas",
-    "trilha_auditoria"
+    "posicionamento",
+    "cadastro_operacional"
   ],
   "properties": {
-    "id_caso": {
-      "type": "string"
-    },
-    "versao_regras": {
-      "type": "string"
-    },
-    "decisao": {
-      "type": "string"
-    },
-    "prazo_ed": {
-      "type": "string",
-      "format": "date"
-    },
-    "status_prazo_ed": {
-      "type": "string"
-    },
-    "dano_material_utilizado": {
-      "type": "string"
-    },
-    "fonte_dano_material": {
-      "type": "string"
-    },
-    "honorarios": {
-      "type": "string"
-    },
-    "compensacao": {
-      "type": "string"
-    },
-    "exposicao_bruta": {
-      "type": "string"
-    },
-    "rota": {
-      "type": "string"
-    },
-    "tipo_registro": {
-      "type": "string"
-    },
-    "obrigacao_operacional": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "proxima_providencia": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "prazo_operacional": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "alertas": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "trilha_auditoria": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    }
-  },
-  "additionalProperties": false
+    "id_caso": {"type": "string"},
+    "decisao": {"type": "string"},
+    "prazo_ed": {"type": "object"},
+    "prazo_recurso_subsequente": {"type": ["object", "null"]},
+    "transito": {"type": "object"},
+    "financeiro": {"type": "object"},
+    "rota": {"type": "string"},
+    "posicionamento": {"type": "string"},
+    "obrigacao_operacional": {"type": ["string", "null"]},
+    "calculadora_externa": {"type": ["object", "null"]},
+    "execucao": {"type": ["object", "null"]},
+    "cadastro_operacional": {"type": "object"},
+    "referencia_docx": {"type": ["string", "null"]},
+    "proxima_providencia": {"type": ["string", "null"]},
+    "prazo_operacional": {"type": ["string", "null"]},
+    "alertas": {"type": "array", "items": {"type": "string"}}
+  }
 }

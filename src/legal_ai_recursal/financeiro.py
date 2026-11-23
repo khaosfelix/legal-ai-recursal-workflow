@@ -1,60 +1,47 @@
-from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
 
 from .enums import FonteValorMaterial
+from .models import AnaliseFinanceira
 
-
-CENTAVOS = Decimal("0.01")
 ZERO = Decimal("0.00")
+CENT = Decimal("0.01")
 
 
-def moeda(valor: Decimal) -> Decimal:
-    return valor.quantize(CENTAVOS, rounding=ROUND_HALF_UP)
+def moeda(v: Decimal) -> Decimal:
+    return v.quantize(CENT, rounding=ROUND_HALF_UP)
 
 
-@dataclass(frozen=True)
-class ApuracaoMaterial:
-    valor: Decimal
-    fonte: FonteValorMaterial
-
-
-def apurar_dano_material(
-    valor_exato: Decimal,
-    estimativa_inicial: Decimal,
-) -> ApuracaoMaterial:
-    if valor_exato > ZERO:
-        return ApuracaoMaterial(moeda(valor_exato), FonteValorMaterial.VALOR_EXATO)
-
-    if estimativa_inicial > ZERO:
-        return ApuracaoMaterial(
-            moeda(estimativa_inicial),
-            FonteValorMaterial.ESTIMATIVA_INICIAL,
-        )
-
-    return ApuracaoMaterial(ZERO, FonteValorMaterial.NAO_INFORMADO)
-
-
-def calcular_honorarios(
+def analisar_financeiro(
     dano_moral: Decimal,
-    dano_material: Decimal,
-    percentual: Decimal,
-    valor_fixo: Decimal,
-) -> Decimal:
-    if valor_fixo > ZERO:
-        return moeda(valor_fixo)
-
-    base = dano_moral + dano_material
-    return moeda(base * (percentual / Decimal("100")))
-
-
-def calcular_exposicao_bruta(
-    dano_moral: Decimal,
-    dano_material: Decimal,
-    honorarios: Decimal,
+    dano_material_exato: Decimal,
+    estimativa_material: Decimal,
+    percentual_honorarios: Decimal,
+    honorarios_fixos: Decimal,
     outras_verbas: Decimal,
-) -> Decimal:
-    """
-    A compensação não entra nesta função.
-    No demo ela é exibida separadamente para preservar rastreabilidade.
-    """
-    return moeda(dano_moral + dano_material + honorarios + outras_verbas)
+    compensacao: Decimal,
+) -> AnaliseFinanceira:
+    if dano_material_exato > ZERO:
+        material = moeda(dano_material_exato)
+        fonte = FonteValorMaterial.VALOR_EXATO
+    elif estimativa_material > ZERO:
+        material = moeda(estimativa_material)
+        fonte = FonteValorMaterial.ESTIMATIVA
+    else:
+        material = ZERO
+        fonte = FonteValorMaterial.NAO_INFORMADO
+
+    if honorarios_fixos > ZERO:
+        honorarios = moeda(honorarios_fixos)
+    else:
+        base = dano_moral + material
+        honorarios = moeda(base * (percentual_honorarios / Decimal("100")))
+
+    exposicao = moeda(dano_moral + material + honorarios + outras_verbas)
+
+    return AnaliseFinanceira(
+        dano_material=material,
+        fonte_material=fonte,
+        honorarios=honorarios,
+        exposicao_bruta=exposicao,
+        compensacao=moeda(compensacao),
+    )

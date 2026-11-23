@@ -1,4 +1,3 @@
-"""Motor público e sintético de Legal AI para portfólio."""
+"""Legal AI Recursal Workflow — versão pública sintética."""
 
-__version__ = "1.0.0"
-VERSAO_REGRAS = "demo-1.0.0"
+__version__ = "3.0.0"

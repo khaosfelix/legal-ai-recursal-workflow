@@ -1,0 +1,15 @@
+{
+  "id_caso": "DEMO-007",
+  "fase": "sentenca",
+  "resultado_decisao": "procedente",
+  "data_intimacao": "2026-11-10",
+  "data_analise": "2026-11-11",
+  "rito": "JEC DEMO",
+  "uf": "XX",
+  "identificador_processo": "DEMO0007",
+  "decisao_liquida": false,
+  "criterios_calculadora": [],
+  "estimativa_material": "1840.50",
+  "percentual_honorarios": "12",
+  "recomendar_recurso": false
+}

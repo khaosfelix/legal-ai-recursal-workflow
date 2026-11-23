@@ -10,17 +10,8 @@
     "data_analise"
   ],
   "properties": {
-    "id_caso": {
-      "type": "string",
-      "minLength": 1
-    },
-    "fase": {
-      "enum": [
-        "sentenca",
-        "acordao",
-        "cumprimento"
-      ]
-    },
+    "id_caso": {"type": "string"},
+    "fase": {"enum": ["sentenca", "acordao", "cumprimento"]},
     "resultado_decisao": {
       "enum": [
         "procedente",
@@ -33,123 +24,59 @@
         "anulado"
       ]
     },
-    "data_intimacao": {
-      "type": "string",
-      "format": "date"
-    },
-    "data_analise": {
-      "type": "string",
-      "format": "date"
-    },
-    "data_transito": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "format": "date"
-    },
-    "dano_moral": {
-      "type": [
-        "string",
-        "number"
-      ],
-      "default": "0.00"
-    },
-    "dano_material_exato": {
-      "type": [
-        "string",
-        "number"
-      ],
-      "default": "0.00"
-    },
-    "estimativa_material_inicial": {
-      "type": [
-        "string",
-        "number"
-      ],
-      "default": "0.00"
-    },
-    "percentual_honorarios": {
-      "type": [
-        "string",
-        "number"
-      ],
-      "default": "0"
-    },
-    "honorarios_fixos": {
-      "type": [
-        "string",
-        "number"
-      ],
-      "default": "0.00"
-    },
-    "outras_verbas_efetivas": {
-      "type": [
-        "string",
-        "number"
-      ],
-      "default": "0.00"
-    },
-    "compensacao": {
-      "type": [
-        "string",
-        "number"
-      ],
-      "default": "0.00"
-    },
-    "criterios_recursais": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "ed_interposto": {
-      "type": "boolean"
-    },
-    "decisao_anulada": {
-      "type": "boolean"
-    },
-    "contestacao_apresentada": {
-      "type": "boolean"
-    },
-    "feriados": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "format": "date"
-      }
-    },
-    "obrigacao": {
-      "type": [
-        "object",
-        "null"
-      ],
+    "data_intimacao": {"type": "string", "format": "date"},
+    "data_analise": {"type": "string", "format": "date"},
+    "data_transito_certificada": {"type": ["string", "null"], "format": "date"},
+    "feriados": {"type": "array", "items": {"type": "string", "format": "date"}},
+    "ed_interposto": {"type": "boolean"},
+    "ed_julgado": {"type": "boolean"},
+    "data_intimacao_pos_ed": {"type": ["string", "null"], "format": "date"},
+    "recurso_subsequente": {
+      "type": ["object", "null"],
       "properties": {
-        "acao": {
-          "type": "string"
-        },
-        "objeto": {
-          "type": "string"
-        },
-        "identificador": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "local": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
+        "nome": {"type": "string"},
+        "prazo_dias_uteis": {"type": "integer", "minimum": 1},
+        "interposto": {"type": "boolean"},
+        "data_base": {"type": ["string", "null"], "format": "date"}
       },
-      "required": [
-        "acao",
-        "objeto"
-      ],
-      "additionalProperties": false
+      "required": ["nome", "prazo_dias_uteis"]
+    },
+    "rito": {"type": "string"},
+    "uf": {"type": "string"},
+    "identificador_processo": {"type": "string"},
+    "decisao_liquida": {"type": "boolean"},
+    "criterios_calculadora": {"type": "array", "items": {"type": "string"}},
+    "dano_moral": {"type": ["string", "number"]},
+    "dano_material_exato": {"type": ["string", "number"]},
+    "estimativa_material": {"type": ["string", "number"]},
+    "percentual_honorarios": {"type": ["string", "number"]},
+    "honorarios_fixos": {"type": ["string", "number"]},
+    "outras_verbas": {"type": ["string", "number"]},
+    "compensacao": {"type": ["string", "number"]},
+    "teses_prioritarias": {"type": "array", "items": {"type": "string"}},
+    "provas_relevantes": {"type": "array", "items": {"type": "string"}},
+    "riscos_recursais": {"type": "array", "items": {"type": "string"}},
+    "recomendar_recurso": {"type": "boolean"},
+    "decisao_anulada": {"type": "boolean"},
+    "contestacao_apresentada": {"type": "boolean"},
+    "obrigacao": {
+      "type": ["object", "null"],
+      "properties": {
+        "acao": {"type": "string"},
+        "objeto": {"type": "string"},
+        "identificador": {"type": ["string", "null"]},
+        "local": {"type": ["string", "null"]}
+      },
+      "required": ["acao", "objeto"]
+    },
+    "cumprimento": {
+      "type": ["object", "null"],
+      "properties": {
+        "valor_devido": {"type": ["string", "number"]},
+        "valor_pago_ou_garantido": {"type": ["string", "number"]},
+        "tipo_deposito": {"enum": ["pagamento_definitivo", "garantia"]}
+      },
+      "required": ["valor_devido", "valor_pago_ou_garantido"]
     }
-  },
-  "additionalProperties": false
+  }
 }

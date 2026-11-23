@@ -5,19 +5,15 @@ on:
   pull_request:
 
 jobs:
-  qualidade:
-    name: Testes e verificação de publicação
+  testes:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configurar Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 

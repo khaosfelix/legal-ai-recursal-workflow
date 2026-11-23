@@ -1,35 +1,35 @@
-# Templates de saída
+# Saídas sintéticas
 
 ## Sentença
 
-```text
-DECISÃO: PARCIALMENTE PROCEDENTE
-PRAZO ED: DD/MM/AAAA — ABERTO
-DANO MATERIAL: R$ X — VALOR_EXATO
-HONORÁRIOS: R$ X
-COMPENSAÇÃO: R$ X — informada separadamente
-EXPOSIÇÃO BRUTA: R$ X
-ROTA: REVISÃO_RECURSAL_RECOMENDADA
-REGISTRO: REGISTRO_DECISÃO_1_GRAU
-OBRIGAÇÃO: [ação operacional]
-```
+A saída pode conter:
+- ED;
+- recurso subsequente;
+- trânsito;
+- posicionamento;
+- obrigação;
+- exposição;
+- campos para a calculadora externa;
+- referência DOCX;
+- bloco de cadastro.
 
-## Acórdão com ED ultrapassado
+## Acórdão
 
-```text
-DECISÃO: DESPROVIDO
-PRAZO ED: DD/MM/AAAA — ULTRAPASSADO
-ROTA: JUSTIFICATIVA_NAO_RECURSO
-REGISTRO: REGISTRO_JUSTIFICATIVA_NÃO_RECURSO
-```
+Não gera calculadora externa.
 
-## Acórdão anulado
+Pode gerar:
+- posicionamento recursal;
+- justificativa de não interposição;
+- trânsito;
+- referência DOCX;
+- dados para cadastro.
 
-```text
-DECISÃO: PROVIDO
-ROTA: RETORNO_ORIGEM
-EXPOSIÇÃO BRUTA: R$ 0,00
-OBRIGAÇÃO: não transportada
-PRÓXIMA PROVIDÊNCIA: AGENDAR_DEFESA_E_SUBSIDIOS
-PRAZO OPERACIONAL: DD/MM/AAAA
-```
+## Cumprimento
+
+Não gera calculadora externa.
+
+Pode gerar:
+- análise do complemento;
+- pagamento x garantia;
+- justificativa operacional;
+- referência DOCX.

@@ -1,18 +1,10 @@
 # Segurança
 
-Este é um projeto público e sintético.
+Não envie dados reais em issues ou pull requests.
 
-Não abra issues contendo:
-- dados pessoais;
-- documentos reais;
-- credenciais;
-- tokens;
-- processos;
-- segredos empresariais.
+Antes de publicar:
 
-Antes de publicar mudanças, execute:
-
-```bash
-python scripts/verificar_publicacao.py
+```powershell
 python -m unittest discover -s tests -v
+python scripts/verificar_publicacao.py
 ```

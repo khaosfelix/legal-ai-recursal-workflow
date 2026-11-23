@@ -1,55 +1,23 @@
-# Como substituir a versão atual pela Premium
+# Atualizar o repositório
 
-A forma mais limpa é manter o histórico Git e substituir os arquivos do repositório.
-
-## 1. Faça uma cópia de segurança da pasta atual
-
-Opcional, mas recomendado.
-
-## 2. Dentro do repositório atual, remova os arquivos rastreados
-
-```powershell
-git rm -r .
-```
-
-Isso remove os arquivos do projeto, **mas mantém a pasta `.git` e o histórico**.
-
-## 3. Copie todo o conteúdo desta versão Premium para a pasta do repositório
-
-A pasta deve voltar a conter `README.md`, `src`, `tests`, `docs`, etc.
-
-## 4. Confira
+Dentro da pasta que já está conectada ao GitHub:
 
 ```powershell
 git status
+git rm -r .
 ```
 
-## 5. Rode os testes
+Copie todo o conteúdo desta versão para a pasta do repositório.
 
-```powershell
-python -m unittest discover -s tests -v
-```
-
-## 6. Rode o scanner de publicação
-
-```powershell
-python scripts/verificar_publicacao.py
-```
-
-## 7. Adicione tudo
+Depois:
 
 ```powershell
 git add .
-```
-
-## 8. Faça o commit
-
-```powershell
-git commit -m "refactor: evolui projeto para arquitetura premium de Legal AI"
-```
-
-## 9. Envie
-
-```powershell
+python -m unittest discover -s tests -v
+python scripts/verificar_publicacao.py
+git status
+git commit -m "feat: completa fluxo de análise e cadastro recursal"
 git push origin main
 ```
+
+O commit descreve a mudança funcional sem termos de marketing ou referência ao processo de montagem do portfólio.

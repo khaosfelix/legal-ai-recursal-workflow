@@ -4,13 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "legal-ai-recursal-workflow"
-version = "1.0.0"
-description = "Workflow demonstrativo de Legal AI com regras determinísticas, prazos, exposição financeira e human-in-the-loop."
+version = "3.0.0"
+description = "Workflow sintético de análise recursal e operação jurídica em alto volume."
 readme = "README.md"
 requires-python = ">=3.11"
-authors = [
-  { name = "khaosfelix" }
-]
 dependencies = []
 
 [project.scripts]

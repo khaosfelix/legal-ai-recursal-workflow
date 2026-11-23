@@ -1,0 +1,22 @@
+{
+  "id_caso": "DEMO-003",
+  "fase": "acordao",
+  "resultado_decisao": "desprovido",
+  "data_intimacao": "2026-11-03",
+  "data_analise": "2026-11-12",
+  "ed_interposto": false,
+  "ed_julgado": false,
+  "recurso_subsequente": {
+    "nome": "RECURSO SUBSEQUENTE DEMO",
+    "prazo_dias_uteis": 15,
+    "interposto": false,
+    "data_base": "2026-11-03"
+  },
+  "dano_moral": "4000",
+  "dano_material_exato": "900",
+  "percentual_honorarios": "10",
+  "teses_prioritarias": ["distinção jurídica relevante no caso sintético"],
+  "provas_relevantes": ["relatório sintético"],
+  "riscos_recursais": ["delimitação fática"],
+  "recomendar_recurso": true
+}

@@ -4,18 +4,10 @@
   "resultado_decisao": "parcialmente_procedente",
   "data_intimacao": "2026-11-17",
   "data_analise": "2026-11-18",
-  "data_transito": null,
-  "dano_moral": "0.00",
-  "dano_material_exato": "2500.00",
-  "estimativa_material_inicial": "0.00",
-  "percentual_honorarios": "0",
-  "honorarios_fixos": "350.00",
-  "outras_verbas_efetivas": "100.00",
-  "compensacao": "0.00",
-  "criterios_recursais": [],
-  "ed_interposto": false,
-  "decisao_anulada": false,
-  "contestacao_apresentada": true,
-  "feriados": [],
-  "obrigacao": null
+  "cumprimento": {
+    "valor_devido": "3200",
+    "valor_pago_ou_garantido": "2500",
+    "tipo_deposito": "pagamento_definitivo"
+  },
+  "recomendar_recurso": false
 }

@@ -1,48 +1,13 @@
-# Roadmap
+# Roadmap público
 
-## v1.0 — atual
+Possíveis evoluções da versão pública:
 
-- domínio tipado;
-- motor de prazo;
-- motor financeiro;
-- obrigação operacional;
-- roteamento;
-- validação;
-- audit trail;
-- casos sintéticos;
-- testes;
-- CI;
-- scanner de publicação.
-
-## v1.1 — integração de IA
-
-- adapter de structured outputs;
-- seleção de provedor;
-- retry controlado;
-- validação de schema na borda;
-- benchmark de extração.
-
-## v1.2 — conhecimento
-
+- adapter de LLM com structured outputs;
+- parser de PDF/DOCX;
 - RAG apenas com fontes públicas;
-- citações por fonte;
-- versionamento de base;
-- avaliação de groundedness.
-
-## v1.3 — produto
-
-- FastAPI;
-- persistência;
-- dashboard;
-- exportação DOCX;
-- trilha de aprovação humana;
-- métricas de precisão/retrabalho.
-
-## v2.0 — operação
-
-- calendário plugável;
-- filas assíncronas;
-- RBAC;
-- observabilidade;
-- feature flags para regras;
-- suíte de evals.
+- calendário oficial plugável;
+- exportação DOCX com estilos mais completos;
+- API;
+- persistência da trilha de auditoria;
+- dashboard de casos sintéticos;
+- benchmark de extração e classificação.

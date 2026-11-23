@@ -1,36 +1,22 @@
-# Contrato de extração
+# Prompt de extração estruturada
 
-A camada de LLM deve produzir um objeto compatível com `schemas/caso_entrada.schema.json`.
+A camada de IA deve transformar os documentos sintéticos em um objeto compatível com o schema de entrada.
 
-Exemplo:
+A extração procura responder:
 
-```json
-{
-  "id_caso": "DEMO-001",
-  "fase": "sentenca",
-  "resultado_decisao": "parcialmente_procedente",
-  "data_intimacao": "2026-11-03",
-  "data_analise": "2026-11-06",
-  "data_transito": null,
-  "dano_moral": "5000.00",
-  "dano_material_exato": "1200.00",
-  "estimativa_material_inicial": "0.00",
-  "percentual_honorarios": "10",
-  "honorarios_fixos": "0.00",
-  "outras_verbas_efetivas": "0.00",
-  "compensacao": "800.00",
-  "criterios_recursais": ["questao_compensacao"],
-  "ed_interposto": false,
-  "decisao_anulada": false,
-  "contestacao_apresentada": true,
-  "feriados": [],
-  "obrigacao": {
-    "acao": "cancelar a",
-    "objeto": "cesta de serviços",
-    "identificador": "DEMO-PACOTE",
-    "local": "conta fictícia da parte autora"
-  }
-}
-```
+1. qual é a decisão candidata?
+2. qual a fase: sentença, acórdão ou cumprimento?
+3. qual o resultado objetivo?
+4. qual a data de intimação?
+5. houve ED? foi julgado?
+6. existe recurso subsequente candidato?
+7. existe data certificada de trânsito?
+8. qual a condenação vigente?
+9. há valor material exato ou apenas estimativa?
+10. há compensação?
+11. há obrigação de fazer?
+12. quais teses merecem revisão?
+13. quais provas sustentam ou enfraquecem a tese?
+14. quais riscos processuais precisam ser registrados?
 
-O contrato é deliberadamente simples para permitir adaptação a qualquer provedor de LLM com structured outputs.
+A LLM extrai. O motor determinístico calcula datas, somas, status e gates.

@@ -1,17 +1,15 @@
 # Changelog
 
-## 1.0.0 — versão pública premium
+## 3.0.0
 
-- documentação integral em português;
-- README orientado a recrutamento;
-- arquitetura modular;
-- domínio tipado com `Enum`;
-- dinheiro com `Decimal`;
-- validação fail-fast;
-- trilha de auditoria;
-- cinco casos sintéticos;
-- suíte ampliada de testes;
-- scanner de publicação;
-- CI com testes + verificação de privacidade;
-- prompts e schemas de extração estruturada;
-- documentação de decisões de engenharia e roadmap.
+- calculadora recursal reposicionada corretamente como ferramenta externa;
+- campos da calculadora somente em sentença;
+- acórdão e cumprimento sem calculadora;
+- cálculo de recurso subsequente;
+- trânsito certificado/estimado/não apurado;
+- linha de trânsito pronta para cadastro;
+- posicionamento recursal;
+- geração sintética de referência DOCX;
+- fluxo de decisão anulada;
+- complemento em execução;
+- documentação revisada para refletir a operação sem expor cliente ou sistemas.
