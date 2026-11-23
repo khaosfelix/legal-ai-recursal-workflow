@@ -1,0 +1,21 @@
+{
+  "case_id": "DEMO-001",
+  "phase": "sentence",
+  "decision_result": "partially_granted",
+  "notification_date": "2026-11-03",
+  "current_date": "2026-11-06",
+  "moral_damages": 5000.0,
+  "material_damages": 1200.0,
+  "material_estimate_from_claim": 0.0,
+  "fee_percentage": 10.0,
+  "fixed_fees": 0.0,
+  "other_effective_amounts": 0.0,
+  "compensation": 800.0,
+  "appeal_criteria": [
+    "compensation_issue"
+  ],
+  "declaratory_motion_filed": false,
+  "judgment_annulled": false,
+  "defense_filed": true,
+  "operative_obligation": "Cancelar a tarifa de pacote de serviços identificada como DEMO-PACOTE na conta fictícia da parte autora."
+}

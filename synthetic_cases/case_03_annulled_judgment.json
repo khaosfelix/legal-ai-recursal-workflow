@@ -1,0 +1,19 @@
+{
+  "case_id": "DEMO-003",
+  "phase": "appeal_judgment",
+  "decision_result": "annulled",
+  "notification_date": "2026-11-04",
+  "current_date": "2026-11-05",
+  "moral_damages": 7000.0,
+  "material_damages": 2100.0,
+  "material_estimate_from_claim": 0.0,
+  "fee_percentage": 10.0,
+  "fixed_fees": 0.0,
+  "other_effective_amounts": 0.0,
+  "compensation": 500.0,
+  "appeal_criteria": [],
+  "declaratory_motion_filed": false,
+  "judgment_annulled": true,
+  "defense_filed": false,
+  "operative_obligation": "Obrigação anterior que não deve ser transportada após a anulação."
+}

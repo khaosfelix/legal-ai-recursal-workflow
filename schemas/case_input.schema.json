@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CaseInput",
+  "type": "object",
+  "required": [
+    "case_id",
+    "phase",
+    "decision_result",
+    "notification_date",
+    "current_date"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string"
+    },
+    "phase": {
+      "enum": [
+        "sentence",
+        "appeal_judgment",
+        "enforcement"
+      ]
+    },
+    "decision_result": {
+      "type": "string"
+    },
+    "notification_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "current_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "moral_damages": {
+      "type": "number",
+      "minimum": 0
+    },
+    "material_damages": {
+      "type": "number",
+      "minimum": 0
+    },
+    "material_estimate_from_claim": {
+      "type": "number",
+      "minimum": 0
+    },
+    "fee_percentage": {
+      "type": "number",
+      "minimum": 0
+    },
+    "fixed_fees": {
+      "type": "number",
+      "minimum": 0
+    },
+    "other_effective_amounts": {
+      "type": "number",
+      "minimum": 0
+    },
+    "compensation": {
+      "type": "number",
+      "minimum": 0
+    },
+    "appeal_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "declaratory_motion_filed": {
+      "type": "boolean"
+    },
+    "judgment_annulled": {
+      "type": "boolean"
+    },
+    "defense_filed": {
+      "type": "boolean"
+    },
+    "operative_obligation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
