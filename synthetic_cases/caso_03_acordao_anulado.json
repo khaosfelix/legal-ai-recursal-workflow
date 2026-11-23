@@ -1,0 +1,26 @@
+{
+  "id_caso": "DEMO-003",
+  "fase": "acordao",
+  "resultado_decisao": "anulado",
+  "data_intimacao": "2026-11-04",
+  "data_analise": "2026-11-05",
+  "data_transito": "2026-11-13",
+  "dano_moral": "7000.00",
+  "dano_material_exato": "2100.00",
+  "estimativa_material_inicial": "0.00",
+  "percentual_honorarios": "10",
+  "honorarios_fixos": "0.00",
+  "outras_verbas_efetivas": "0.00",
+  "compensacao": "500.00",
+  "criterios_recursais": [],
+  "ed_interposto": false,
+  "decisao_anulada": true,
+  "contestacao_apresentada": false,
+  "feriados": [],
+  "obrigacao": {
+    "acao": "cancelar a",
+    "objeto": "cobrança anterior",
+    "identificador": "DEMO-ANTIGA",
+    "local": "conta fictícia"
+  }
+}

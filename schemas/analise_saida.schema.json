@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SaidaAnalise",
+  "type": "object",
+  "required": [
+    "id_caso",
+    "versao_regras",
+    "decisao",
+    "prazo_ed",
+    "status_prazo_ed",
+    "dano_material_utilizado",
+    "fonte_dano_material",
+    "honorarios",
+    "compensacao",
+    "exposicao_bruta",
+    "rota",
+    "tipo_registro",
+    "alertas",
+    "trilha_auditoria"
+  ],
+  "properties": {
+    "id_caso": {
+      "type": "string"
+    },
+    "versao_regras": {
+      "type": "string"
+    },
+    "decisao": {
+      "type": "string"
+    },
+    "prazo_ed": {
+      "type": "string",
+      "format": "date"
+    },
+    "status_prazo_ed": {
+      "type": "string"
+    },
+    "dano_material_utilizado": {
+      "type": "string"
+    },
+    "fonte_dano_material": {
+      "type": "string"
+    },
+    "honorarios": {
+      "type": "string"
+    },
+    "compensacao": {
+      "type": "string"
+    },
+    "exposicao_bruta": {
+      "type": "string"
+    },
+    "rota": {
+      "type": "string"
+    },
+    "tipo_registro": {
+      "type": "string"
+    },
+    "obrigacao_operacional": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "proxima_providencia": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "prazo_operacional": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "alertas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "trilha_auditoria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

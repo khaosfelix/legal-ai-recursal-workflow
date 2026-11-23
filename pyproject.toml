@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "legal-ai-recursal-workflow"
+version = "1.0.0"
+description = "Workflow demonstrativo de Legal AI com regras determinísticas, prazos, exposição financeira e human-in-the-loop."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "khaosfelix" }
+]
+dependencies = []
+
+[project.scripts]
+legal-ai-demo = "legal_ai_recursal.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,51 +1,61 @@
+import json
 import unittest
-from src.engine import analyze_dict
+from pathlib import Path
 
-def base():
-    return {
-        "case_id":"T","phase":"sentence","decision_result":"partially_granted",
-        "notification_date":"2026-11-03","current_date":"2026-11-04",
-        "moral_damages":0,"material_damages":0,"material_estimate_from_claim":0,
-        "fee_percentage":0,"fixed_fees":0,"other_effective_amounts":0,"compensation":0,
-        "appeal_criteria":[],"declaratory_motion_filed":False,"judgment_annulled":False,
-        "defense_filed":True,"operative_obligation":None
-    }
+from _bootstrap import ROOT
+from legal_ai_recursal.engine import analisar_caso
+from legal_ai_recursal.enums import (
+    FonteValorMaterial,
+    RotaAnalise,
+    StatusPrazo,
+)
+from legal_ai_recursal.models import CasoEntrada
+
+
+def carregar(nome: str) -> CasoEntrada:
+    payload = json.loads(
+        (ROOT / "synthetic_cases" / nome).read_text(encoding="utf-8")
+    )
+    return CasoEntrada.from_dict(payload)
+
 
 class EngineTests(unittest.TestCase):
-    def test_gross_total_does_not_subtract_compensation(self):
-        p=base()
-        p.update(moral_damages=5000,material_damages=1200,fee_percentage=10,compensation=800)
-        r=analyze_dict(p)
-        self.assertEqual(r["fees"],620.0)
-        self.assertEqual(r["gross_total"],6820.0)
-        self.assertEqual(r["compensation"],800.0)
+    def test_sentenca_fluxo_completo(self):
+        saida = analisar_caso(carregar("caso_01_sentenca.json"))
+        self.assertEqual(saida.exposicao_bruta.as_tuple().exponent, -2)
+        self.assertEqual(str(saida.exposicao_bruta), "6820.00")
+        self.assertEqual(saida.compensacao, saida.compensacao.__class__("800.00"))
+        self.assertEqual(saida.rota, RotaAnalise.REVISAO_RECURSAL)
+        self.assertIsNotNone(saida.obrigacao_operacional)
 
-    def test_material_estimate(self):
-        p=base()
-        p.update(material_estimate_from_claim=1500)
-        r=analyze_dict(p)
-        self.assertEqual(r["material_value_used"],1500)
-        self.assertTrue(r["warnings"])
+    def test_estimativa_material_gera_alerta(self):
+        saida = analisar_caso(carregar("caso_04_estimativa_material.json"))
+        self.assertEqual(
+            saida.fonte_dano_material,
+            FonteValorMaterial.ESTIMATIVA_INICIAL,
+        )
+        self.assertTrue(saida.alertas)
 
-    def test_overdue_ed_triggers_non_appeal(self):
-        p=base()
-        p.update(phase="appeal_judgment",decision_result="appeal_denied",
-                 notification_date="2026-10-20",current_date="2026-11-03")
-        r=analyze_dict(p)
-        self.assertEqual(r["deadline_status"],"ULTRAPASSADO")
-        self.assertEqual(r["route"],"NON_APPEAL_JUSTIFICATION")
+    def test_acordao_ultrapassado_dispara_nao_recurso(self):
+        saida = analisar_caso(
+            carregar("caso_02_acordao_prazo_ultrapassado.json")
+        )
+        self.assertEqual(saida.status_prazo_ed, StatusPrazo.ULTRAPASSADO)
+        self.assertEqual(saida.rota, RotaAnalise.JUSTIFICATIVA_NAO_RECURSO)
 
-    def test_annulled_judgment_clears_merits_exposure(self):
-        p=base()
-        p.update(phase="appeal_judgment",decision_result="annulled",
-                 judgment_annulled=True,defense_filed=False,
-                 moral_damages=5000,material_damages=2000,fee_percentage=10,
-                 operative_obligation="Old obligation")
-        r=analyze_dict(p)
-        self.assertEqual(r["gross_total"],0.0)
-        self.assertIsNone(r["obligation"])
-        self.assertEqual(r["route"],"RETURN_TO_ORIGIN")
-        self.assertIsNotNone(r["next_operational_deadline"])
+    def test_anulado_limpa_exposicao_e_obrigacao(self):
+        saida = analisar_caso(carregar("caso_03_acordao_anulado.json"))
+        self.assertEqual(str(saida.exposicao_bruta), "0.00")
+        self.assertEqual(str(saida.dano_material_utilizado), "0.00")
+        self.assertEqual(str(saida.honorarios), "0.00")
+        self.assertIsNone(saida.obrigacao_operacional)
+        self.assertEqual(saida.rota, RotaAnalise.RETORNO_ORIGEM)
+        self.assertIsNotNone(saida.prazo_operacional)
+
+    def test_trilha_de_auditoria_nao_vem_vazia(self):
+        saida = analisar_caso(carregar("caso_01_sentenca.json"))
+        self.assertGreaterEqual(len(saida.trilha_auditoria), 4)
+
 
 if __name__ == "__main__":
     unittest.main()

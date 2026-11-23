@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CasoEntrada",
+  "type": "object",
+  "required": [
+    "id_caso",
+    "fase",
+    "resultado_decisao",
+    "data_intimacao",
+    "data_analise"
+  ],
+  "properties": {
+    "id_caso": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fase": {
+      "enum": [
+        "sentenca",
+        "acordao",
+        "cumprimento"
+      ]
+    },
+    "resultado_decisao": {
+      "enum": [
+        "procedente",
+        "parcialmente_procedente",
+        "improcedente",
+        "provido",
+        "parcialmente_provido",
+        "desprovido",
+        "nao_conhecido",
+        "anulado"
+      ]
+    },
+    "data_intimacao": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_analise": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_transito": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "dano_moral": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "default": "0.00"
+    },
+    "dano_material_exato": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "default": "0.00"
+    },
+    "estimativa_material_inicial": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "default": "0.00"
+    },
+    "percentual_honorarios": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "default": "0"
+    },
+    "honorarios_fixos": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "default": "0.00"
+    },
+    "outras_verbas_efetivas": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "default": "0.00"
+    },
+    "compensacao": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "default": "0.00"
+    },
+    "criterios_recursais": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ed_interposto": {
+      "type": "boolean"
+    },
+    "decisao_anulada": {
+      "type": "boolean"
+    },
+    "contestacao_apresentada": {
+      "type": "boolean"
+    },
+    "feriados": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "date"
+      }
+    },
+    "obrigacao": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "acao": {
+          "type": "string"
+        },
+        "objeto": {
+          "type": "string"
+        },
+        "identificador": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "local": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "acao",
+        "objeto"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

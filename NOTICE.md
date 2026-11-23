@@ -1,6 +1,5 @@
-# Notice
+# Aviso
 
-Código e documentação publicados para fins de demonstração profissional.
+Este repositório é um case técnico de portfólio.
 
-Os casos, regras e dados deste repositório são sintéticos.
-Nenhum conteúdo confidencial de terceiros é distribuído aqui.
+Dados, regras, valores, pessoas e cenários são sintéticos. A arquitetura pública foi redesenhada para demonstrar competências de automação, Legal AI e Legal Ops sem reproduzir procedimentos confidenciais de terceiros.
